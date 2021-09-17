@@ -7,3 +7,12 @@ Subscribes:
 
 Publishes
 - raw camera feed
+
+## Notes:
+
+Publish Camera:
+> ros2 run image_tools cam2image --ros-args -p frequency:=2.0
+
+View Published Image:
+> ros2 run image_view image_view
+
