@@ -13,6 +13,7 @@
 // limitations under the License.
 
 #include "ros2_control_demo_hardware/diffbot_system.hpp"
+#include "ros2_control_demo_hardware/hardware_node.hpp"
 
 #include <chrono>
 #include <cmath>
@@ -210,6 +211,8 @@ hardware_interface::return_type DiffBotSystemHardware::read()
 hardware_interface::return_type ros2_control_demo_hardware::DiffBotSystemHardware::write()
 {
   RCLCPP_INFO(rclcpp::get_logger("DiffBotSystemHardware"), "Writing...");
+
+  hardware_node.publish_vel();
 
   for (auto i = 0u; i < hw_commands_.size(); i++)
   {

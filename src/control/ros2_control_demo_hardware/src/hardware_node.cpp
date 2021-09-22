@@ -23,3 +23,17 @@ void HardwareNode::right_wheel_velocity_callback(const std_msgs::msg::Float32::S
 	right_vel = msg->data.float_value();
 	RCLCPP_INFO(this->get_logger(), "Right wheel velocity '%f'", msg->data.float_value());
 }
+
+void HardwareNode::publish_vel()
+{
+	  auto left_msg = std_msgs::msg::Float32();
+	  auto right_msg = std_msgs::msg::Float32();
+
+      left_msg.data = left_vel;
+      right_msg.data = right_vel;
+
+      RCLCPP_INFO(this->get_logger(), "Publishing: %f %f", left_msg.data.float_value(), right_msg.data.float_value());
+
+      left_wheel_publisher_->publish(left_msg);
+      left_wheel_publisher_->publish(right_msg);
+}

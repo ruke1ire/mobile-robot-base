@@ -34,6 +34,8 @@ Convert Image:
 
 - seems like the ubuntu should be a 64 bit operating system to be able to install the binaries
 
+- copy the publisher and subscribers written in the diff_drive_controller and implement it in the hardware interface because both of them are plugins
+
 Reference:
 1. https://medium.com/swlh/raspberry-pi-ros-2-camera-eef8f8b94304[v4l2_camera]:%20Failed%20getting[v4l2_camera]:%20Failed%20getting%20value%20for%20control%2010027009:%20Permission%20denied%20(13);%20returning%200!%20value%20for%20control%2010027009:%20Permission%20denied%20(13);%20returning%200!
 

@@ -70,6 +70,9 @@ private:
 
   // Store the wheeled robot position
   double base_x_, base_y_, base_theta_;
+
+  // Node
+  HardwareNode hardware_node;
 };
 
 }  // namespace ros2_control_demo_hardware
