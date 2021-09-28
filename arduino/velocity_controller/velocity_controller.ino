@@ -12,7 +12,7 @@ const int MOTOR_RIGHT_SPEED = 7;
 const int MOTOR_RIGHT_A = 8;
 const int MOTOR_RIGHT_B = 9;
 
-const double PID[3] = {0.01, 0.0, 0.0};
+const double PI_value[2] = {0.01, 0.0};
 
 volatile long int count_left = 0;
 volatile long int count_right = 0;
@@ -27,9 +27,11 @@ void update_left_b();
 void update_right_a();
 void update_right_b();
 
-double control(double desired, double actual, double pid[3]);
+double control_l(double desired, double actual, double pi[2]);
+double control_r(double desired, double actual, double pi[2]);
 double convert_to_radians(int count);
 void compute_vel();
+void drive_motor(char wheel, double control_out);
 
 void setup() {
   Serial.begin(250000);
@@ -57,9 +59,11 @@ void loop() {
   Serial.print(actual_vel_left, 6);
   Serial.print("\tVel Right: ");
   Serial.println(actual_vel_right,6);
-  
+  double control_out_l = control_l(desired_vel_left, actual_vel_left, PI_value);
+  double control_out_r = control_r(desired_vel_right, actual_vel_right, PI_value);
+  drive_motor('l', control_out_l);
+  drive_motor('r', control_out_r);
   delay(10);
-
 }
 
 void update_left_a() {
@@ -150,9 +154,24 @@ void update_right_b() {
   }
 }
 
-double control(double desired, double actual, double pid[3]){
-  
-  
+double control_l(double desired, double actual, double pi[2]){
+  static double e_sum = 0;
+  static unsigned long int previous_time = micros();
+  double current_time = micros();
+  double e = actual-desired;
+  e_sum += e*(double)(current_time - previous_time)/1000000.0;
+  previous_time = current_time;
+  return pi[0]*e + pi[1]*e_sum;
+}
+
+double control_r(double desired, double actual, double pi[2]){
+  static double e_sum = 0;
+  static unsigned long int previous_time = micros();
+  double current_time = micros();
+  double e = actual-desired;
+  e_sum += e*(double)(current_time - previous_time)/1000000.0;
+  previous_time = current_time;
+  return pi[0]*e + pi[1]*e_sum;
 }
 
 double convert_to_radians(int count){
@@ -173,4 +192,29 @@ void compute_vel(){
   previous_angle_left = current_angle_left;
   previous_angle_right = current_angle_right;
   previous_time = current_time;
+}
+
+void drive_motor(char wheel, double control_out){
+  if(wheel == 'l'){
+    int a = MOTOR_LEFT_A;
+    int b = MOTOR_LEFT_B;
+    int pwm = MOTOR_LEFT_SPEED;
+  }
+  else if(wheel == 'r'){
+    int a = MOTOR_RIGHT_A;
+    int b = MOTOR_RIGHT_B;
+    int pwm = MOTOR_RIGHT_SPEED;
+  }
+  else{
+    return;
+  }
+  if(control_out > 0.0){
+    digitalWrite(a, HIGH);
+    digitalWrite(b, LOW);
+  }
+  else if(control_out < 0.0){
+    digitalWrite(a, LOW);
+    digitalWrite(b, HIGH);
+  }
+  analogWrite(pwm, min(int(abs(control_out)),255));
 }
