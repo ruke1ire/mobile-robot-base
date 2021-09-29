@@ -11,7 +11,7 @@ Structure:
 - all commands/response starts with "[" and ends with "]"
     - eg. [get vel]
 - variables and values separated with ":"
-- multiple variables separated with ","
+- multiple variables/commands separated with ","
 - " ", "\n", "\t" are ignored
 
 ------------------------------------

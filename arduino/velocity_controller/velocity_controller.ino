@@ -1,5 +1,8 @@
 #define COUNT_REV 3000
 
+#include "SerialCommunicator.h"
+#include <Thread.h>
+
 const int ENC_LEFT_A = 18;
 const int ENC_LEFT_B = 19;
 const int ENC_RIGHT_A = 20;
@@ -12,7 +15,9 @@ const int MOTOR_RIGHT_SPEED = 7;
 const int MOTOR_RIGHT_A = 8;
 const int MOTOR_RIGHT_B = 9;
 
-const double PI_value[2] = {0.01, 0.0};
+double PI_value[2] = {0.01, 0.0};
+
+const int baudrate = 19200;
 
 volatile long int count_left = 0;
 volatile long int count_right = 0;
@@ -32,9 +37,11 @@ double control_r(double desired, double actual, double pi[2]);
 double convert_to_radians(int count);
 void compute_vel();
 void drive_motor(char wheel, double control_out);
+void control_loop();
+
+Thread control_thread = Thread();
 
 void setup() {
-  Serial.begin(19200);
   
   attachInterrupt(digitalPinToInterrupt(ENC_LEFT_A), update_left_a, CHANGE);
   attachInterrupt(digitalPinToInterrupt(ENC_LEFT_B), update_left_b, CHANGE);
@@ -47,23 +54,16 @@ void setup() {
   pinMode(MOTOR_RIGHT_SPEED, OUTPUT);
   pinMode(MOTOR_RIGHT_A, OUTPUT);
   pinMode(MOTOR_RIGHT_B, OUTPUT);
+
+  SerialCommunicator serial_com(baudrate);
+  
+  control_thread.onRun(control_loop);
+  control_thread.run();
+
+  serial_com.communicator_loop();
 }
 
 void loop() {
-  compute_vel();
-  Serial.print("Angle Left: ");
-  Serial.print(convert_to_radians(count_left));
-  Serial.print("\tAngle Right: ");
-  Serial.print(convert_to_radians(count_right));
-  Serial.print("\tVel Left: ");
-  Serial.print(actual_vel_left, 6);
-  Serial.print("\tVel Right: ");
-  Serial.println(actual_vel_right,6);
-  double control_out_l = control_l(desired_vel_left, actual_vel_left, PI_value);
-  double control_out_r = control_r(desired_vel_right, actual_vel_right, PI_value);
-  drive_motor('l', control_out_l);
-  drive_motor('r', control_out_r);
-  delay(10);
 }
 
 void update_left_a() {
@@ -220,4 +220,13 @@ void drive_motor(char wheel, double control_out){
     digitalWrite(b, HIGH);
   }
   analogWrite(pwm, min(int(abs(control_out)),255));
+}
+
+void control_loop(){
+  compute_vel();
+  double control_out_l = control_l(desired_vel_left, actual_vel_left, PI_value);
+  double control_out_r = control_r(desired_vel_right, actual_vel_right, PI_value);
+  drive_motor('l', control_out_l);
+  drive_motor('r', control_out_r);
+  delay(10);
 }
