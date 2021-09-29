@@ -16,6 +16,7 @@ const int MOTOR_RIGHT_A = 8;
 const int MOTOR_RIGHT_B = 9;
 
 double PI_value[2] = {0.01, 0.0};
+const int control_period = 10;
 
 const int baudrate = 19200;
 
@@ -39,10 +40,10 @@ void compute_vel();
 void drive_motor(char wheel, double control_out);
 void control_loop();
 
-Thread control_thread = Thread();
+SerialCommunicator serial_com(baudrate);
 
 void setup() {
-  
+  Serial.begin(baudrate);
   attachInterrupt(digitalPinToInterrupt(ENC_LEFT_A), update_left_a, CHANGE);
   attachInterrupt(digitalPinToInterrupt(ENC_LEFT_B), update_left_b, CHANGE);
   attachInterrupt(digitalPinToInterrupt(ENC_RIGHT_A), update_right_a, CHANGE);
@@ -54,16 +55,25 @@ void setup() {
   pinMode(MOTOR_RIGHT_SPEED, OUTPUT);
   pinMode(MOTOR_RIGHT_A, OUTPUT);
   pinMode(MOTOR_RIGHT_B, OUTPUT);
-
-  SerialCommunicator serial_com(baudrate);
-  
-  control_thread.onRun(control_loop);
-  control_thread.run();
-
-  serial_com.communicator_loop();
 }
 
 void loop() {
+  static unsigned long int prev_control = millis();
+  static unsigned long int prev_serial = millis();
+  unsigned long int now = millis();
+
+  if((now-prev_control)>control_period){
+    prev_control = now;
+    compute_vel();
+    double control_out_l = control_l(desired_vel_left, actual_vel_left, PI_value);
+    double control_out_r = control_r(desired_vel_right, actual_vel_right, PI_value);
+    drive_motor('l', control_out_l);
+    drive_motor('r', control_out_r);
+  }
+  else if((now-prev_serial)>1){
+    serial_com.communicator_loop();
+    prev_serial = now;
+  }
 }
 
 void update_left_a() {
@@ -220,13 +230,4 @@ void drive_motor(char wheel, double control_out){
     digitalWrite(b, HIGH);
   }
   analogWrite(pwm, min(int(abs(control_out)),255));
-}
-
-void control_loop(){
-  compute_vel();
-  double control_out_l = control_l(desired_vel_left, actual_vel_left, PI_value);
-  double control_out_r = control_r(desired_vel_right, actual_vel_right, PI_value);
-  drive_motor('l', control_out_l);
-  drive_motor('r', control_out_r);
-  delay(10);
 }

@@ -16,28 +16,25 @@ SerialCommunicator::SerialCommunicator(int baudrate)
 
 void SerialCommunicator::communicator_loop()
 {
-    while(1){
-        if(Serial.available() > 0){
-            char in_byte = Serial.read();
-            bool done = tokenize(in_byte);
-            if(done == true){
-                Serial.print("Token: ");
-                Serial.println(token);
-                bool parse_done = parse();
-                if(parse_done){
-                    Serial.print("Flag: ");
-                    Serial.print(node.flag);
-                    Serial.print("\tVariable: ");
-                    Serial.print(node.variable);
-                    Serial.println();
-                    interpret();
-                    node.reset();
-                    Serial.println("---------------------");
-                }
+    if(Serial.available() > 0){
+        char in_byte = Serial.read();
+        bool done = tokenize(in_byte);
+        if(done == true){
+            Serial.print("Token: ");
+            Serial.println(token);
+            bool parse_done = parse();
+            if(parse_done){
+                Serial.print("Flag: ");
+                Serial.print(node.flag);
+                Serial.print("\tVariable: ");
+                Serial.print(node.variable);
+                Serial.println();
+                interpret();
+                node.reset();
+                Serial.println("---------------------");
             }
         }
     }
-    return;
 }
 
 bool SerialCommunicator::tokenize(char in_byte)
