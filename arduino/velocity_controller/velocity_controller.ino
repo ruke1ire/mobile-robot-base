@@ -34,7 +34,7 @@ void compute_vel();
 void drive_motor(char wheel, double control_out);
 
 void setup() {
-  Serial.begin(250000);
+  Serial.begin(19200);
   
   attachInterrupt(digitalPinToInterrupt(ENC_LEFT_A), update_left_a, CHANGE);
   attachInterrupt(digitalPinToInterrupt(ENC_LEFT_B), update_left_b, CHANGE);
@@ -195,15 +195,18 @@ void compute_vel(){
 }
 
 void drive_motor(char wheel, double control_out){
+  int a;
+  int b;
+  int pwm;
   if(wheel == 'l'){
-    int a = MOTOR_LEFT_A;
-    int b = MOTOR_LEFT_B;
-    int pwm = MOTOR_LEFT_SPEED;
+    a = MOTOR_LEFT_A;
+    b = MOTOR_LEFT_B;
+    pwm = MOTOR_LEFT_SPEED;
   }
   else if(wheel == 'r'){
-    int a = MOTOR_RIGHT_A;
-    int b = MOTOR_RIGHT_B;
-    int pwm = MOTOR_RIGHT_SPEED;
+    a = MOTOR_RIGHT_A;
+    b = MOTOR_RIGHT_B;
+    pwm = MOTOR_RIGHT_SPEED;
   }
   else{
     return;

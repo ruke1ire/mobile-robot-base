@@ -1,0 +1,38 @@
+SERIAL COMMUNICATION PROTOCOL
+------------------------------------
+
+Roles:
+- Raspberry pi (Master) sends all the commands.
+- Arduino (Slave) receives and responds to the commands.
+
+------------------------------------
+
+Structure:
+- all commands/response starts with "[" and ends with "]"
+    - eg. [get vel]
+- variables and values separated with ":"
+- multiple variables separated with ","
+- " ", "\n", "\t" are ignored
+
+------------------------------------
+
+Units:
+- angular velocity: 0.1deg/sec
+- angle: 0.1deg
+
+------------------------------------
+
+Commands:
+
+- Get velocity (Command/Response)
+    - Command: "[get vel]"
+    - Response: "[l:<left velocity>, r:<right velocity>]"
+        - eg. [l: 300, r: -100] -> left wheel velocity = 30deg/sec, right wheel velocity = -10deg/sec
+
+- Get position? (Command/Response)
+    - Command: "[get pos]"
+    - Response: "[l:<left position>, r:<right position>]"
+        - eg. [l: 300, r: -100] -> left wheel velocity = 30deg, right wheel velocity = -10deg
+
+- Set velocity (Command)
+    - Command "[set vel l: 100, set vel r: 120]"
