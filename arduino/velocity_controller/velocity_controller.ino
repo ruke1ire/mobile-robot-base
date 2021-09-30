@@ -1,4 +1,4 @@
-#define COUNT_REV 3000
+ #define COUNT_REV 3000
 
 #include "SerialCommunicator.h"
 #include <Thread.h>
@@ -15,8 +15,8 @@ const int MOTOR_RIGHT_SPEED = 7;
 const int MOTOR_RIGHT_A = 8;
 const int MOTOR_RIGHT_B = 9;
 
-double PI_value[2] = {0.01, 0.0};
-const int control_period = 10;
+double PI_value[2] = {-10.0, -100.0};
+const int control_period = 20;
 
 const int baudrate = 19200;
 
@@ -67,6 +67,7 @@ void loop() {
     compute_vel();
     double control_out_l = control_l(desired_vel_left, actual_vel_left, PI_value);
     double control_out_r = control_r(desired_vel_right, actual_vel_right, PI_value);
+    
     drive_motor('l', control_out_l);
     drive_motor('r', control_out_r);
   }
@@ -171,6 +172,12 @@ double control_l(double desired, double actual, double pi[2]){
   double e = actual-desired;
   e_sum += e*(double)(current_time - previous_time)/1000000.0;
   previous_time = current_time;
+  if(e_sum > 0){
+    e_sum = min(e_sum, 255.0/(-pi[1]));
+  }
+  else if(e_sum < 0){
+    e_sum = max(e_sum, 255.0/(pi[1]));
+  }
   return pi[0]*e + pi[1]*e_sum;
 }
 
@@ -181,6 +188,13 @@ double control_r(double desired, double actual, double pi[2]){
   double e = actual-desired;
   e_sum += e*(double)(current_time - previous_time)/1000000.0;
   previous_time = current_time;
+  if(e_sum > 0){
+    e_sum = min(e_sum, 255.0/(-pi[1]));
+  }
+  else if(e_sum < 0){
+    e_sum = max(e_sum, 255.0/(pi[1]));
+  }
+  return pi[0]*e + pi[1]*e_sum;
   return pi[0]*e + pi[1]*e_sum;
 }
 
@@ -194,11 +208,23 @@ void compute_vel(){
   static unsigned long int previous_time = micros();
   double current_angle_left = convert_to_radians(count_left);
   double current_angle_right = convert_to_radians(count_right);
-  double current_time = micros();
+  unsigned long int current_time = micros();
 
-  actual_vel_left = (current_angle_left-previous_angle_left)/((double)(current_time-previous_time)/1000000.0);
-  actual_vel_right = (current_angle_right-previous_angle_right)/((double)(current_time-previous_time)/1000000.0);
-
+  double actual_vel_left_tmp = (current_angle_left-previous_angle_left)/((double)(current_time-previous_time+1)/1000000.0);
+  double actual_vel_right_tmp = (current_angle_right-previous_angle_right)/((double)(current_time-previous_time+1)/1000000.0);
+  if(abs(actual_vel_left_tmp)>100.0){
+    
+  }
+  else{
+    actual_vel_left = actual_vel_left_tmp;
+  }
+  
+  if(abs(actual_vel_right_tmp)>100.0){
+    
+  }
+  else{
+    actual_vel_right = actual_vel_right_tmp;
+  }
   previous_angle_left = current_angle_left;
   previous_angle_right = current_angle_right;
   previous_time = current_time;
