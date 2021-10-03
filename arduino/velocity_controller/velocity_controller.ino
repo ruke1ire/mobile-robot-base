@@ -9,8 +9,8 @@ const int ENC_RIGHT_A = 20;
 const int ENC_RIGHT_B = 21;
 
 const int MOTOR_LEFT_SPEED = 4;
-const int MOTOR_LEFT_A = 5;
-const int MOTOR_LEFT_B = 6;
+const int MOTOR_LEFT_A = 6;
+const int MOTOR_LEFT_B = 5;
 const int MOTOR_RIGHT_SPEED = 7;
 const int MOTOR_RIGHT_A = 8;
 const int MOTOR_RIGHT_B = 9;
@@ -194,7 +194,6 @@ double control_r(double desired, double actual, double pi[2]){
   else if(e_sum < 0){
     e_sum = max(e_sum, 255.0/(pi[1]));
   }
-  return pi[0]*e + pi[1]*e_sum;
   return pi[0]*e + pi[1]*e_sum;
 }
 
