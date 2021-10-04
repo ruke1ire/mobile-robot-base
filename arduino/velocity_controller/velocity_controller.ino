@@ -16,9 +16,9 @@ const int MOTOR_RIGHT_A = 8;
 const int MOTOR_RIGHT_B = 9;
 
 double PI_value[2] = {-10.0, -100.0};
-const int control_period = 20;
+const int control_period = 20; 
 
-const int baudrate = 19200;
+const int baudrate = 9600;
 
 volatile long int count_left = 0;
 volatile long int count_right = 0;
@@ -70,6 +70,7 @@ void loop() {
     
     drive_motor('l', control_out_l);
     drive_motor('r', control_out_r);
+
   }
   else if((now-prev_serial)>1){
     serial_com.communicator_loop();

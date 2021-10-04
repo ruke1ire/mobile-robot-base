@@ -20,18 +20,10 @@ void SerialCommunicator::communicator_loop()
         char in_byte = Serial.read();
         bool done = tokenize(in_byte);
         if(done == true){
-            Serial.print("Token: ");
-            Serial.println(token);
             bool parse_done = parse();
             if(parse_done){
-                Serial.print("Flag: ");
-                Serial.print(node.flag);
-                Serial.print("\tVariable: ");
-                Serial.print(node.variable);
-                Serial.println();
                 interpret();
                 node.reset();
-                Serial.println("---------------------");
             }
         }
     }
@@ -135,17 +127,12 @@ void SerialCommunicator::interpret()
         }
         response[response_index++] = ']';
         response[response_index++] = '\0';
-        Serial.print("Response: ");
         Serial.println(response);
     }
     else if(node.flag == SET_VEL_L_FLAG){
         desired_vel_left = (double)atoi(node.variable)*PI/180/10;
-        Serial.print("Response: ");
-        Serial.println(desired_vel_left);
     }
     else if(node.flag == SET_VEL_R_FLAG){
         desired_vel_right = (double)atoi(node.variable)*PI/180/10;
-        Serial.print("Response: ");
-        Serial.println(desired_vel_right);
     }
 }
