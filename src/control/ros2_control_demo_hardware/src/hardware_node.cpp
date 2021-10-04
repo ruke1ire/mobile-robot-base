@@ -3,7 +3,7 @@
 
 #include "ros2_control_demo_hardware/hardware_node.hpp"
 
-HardwareNode::HardwareNode() : Node("hardware_node")
+HardwareNode::HardwareNode()
 {
 	left_wheel_publisher_ = this->create_publisher<std_msgs::msg::Float32>("left_wheel_vel", 10);
 	right_wheel_publisher_ = this->create_publisher<std_msgs::msg::Float32>("right_wheel_vel", 10);

@@ -19,6 +19,8 @@
 #include <string>
 #include <vector>
 
+#include "rclcpp/rclcpp.hpp"
+
 #include "hardware_interface/base_interface.hpp"
 #include "hardware_interface/handle.hpp"
 #include "hardware_interface/hardware_info.hpp"
@@ -27,7 +29,7 @@
 #include "hardware_interface/types/hardware_interface_status_values.hpp"
 #include "rclcpp/macros.hpp"
 #include "ros2_control_demo_hardware/visibility_control.h"
-#include "ros2_control_demo_hardware/hardware_node.hpp"
+#include "std_msgs/msg/float32.hpp"
 
 namespace ros2_control_demo_hardware
 {
@@ -72,7 +74,17 @@ private:
   double base_x_, base_y_, base_theta_;
 
   // Node
-  HardwareNode hardware_node;
+  std::shared_ptr<rclcpp::Node> node_;
+  std::shared_ptr<rclcpp::Publisher<std_msgs::msg::Float32>> left_publisher = nullptr;
+  std::shared_ptr<rclcpp::Publisher<std_msgs::msg::Float32>> right_publisher = nullptr;
+  rclcpp::Subscription<std_msgs::msg::Float32>::SharedPtr left_subscriber = nullptr;
+  rclcpp::Subscription<std_msgs::msg::Float32>::SharedPtr right_subscriber = nullptr;
+
+  float left_vel = 0.0;
+  float right_vel = 0.0;
+
+  std::thread spin_thread;
+
 };
 
 }  // namespace ros2_control_demo_hardware

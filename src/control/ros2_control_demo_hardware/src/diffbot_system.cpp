@@ -1,4 +1,4 @@
-// Copyright 2021 ros2_control Development Team
+
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,22 +13,46 @@
 // limitations under the License.
 
 #include "ros2_control_demo_hardware/diffbot_system.hpp"
-#include "ros2_control_demo_hardware/hardware_node.hpp"
 
 #include <chrono>
 #include <cmath>
 #include <limits>
 #include <memory>
 #include <vector>
+#include <thread>
 
 #include "hardware_interface/types/hardware_interface_type_values.hpp"
 #include "rclcpp/rclcpp.hpp"
+#include "std_msgs/msg/float32.hpp"
 
 namespace ros2_control_demo_hardware
 {
 hardware_interface::return_type DiffBotSystemHardware::configure(
   const hardware_interface::HardwareInfo & info)
 {
+
+  node_ = std::make_shared<rclcpp::Node>("hardware_node", rclcpp::NodeOptions());
+
+  left_publisher = node_->create_publisher<std_msgs::msg::Float32>("desired_left_vel", rclcpp::SystemDefaultsQoS());
+  right_publisher = node_->create_publisher<std_msgs::msg::Float32>("desired_right_vel", rclcpp::SystemDefaultsQoS());
+
+  left_subscriber = node_->create_subscription<std_msgs::msg::Float32>(
+        "actual_left_vel", rclcpp::SystemDefaultsQoS(),
+        [this](const std::shared_ptr<std_msgs::msg::Float32> msg) -> void {
+          left_vel = msg->data;
+          RCLCPP_INFO(node_->get_logger(), "Left wheel velocity '%f'", msg->data);
+        });
+  right_subscriber = node_->create_subscription<std_msgs::msg::Float32>(
+        "actual_right_vel", rclcpp::SystemDefaultsQoS(),
+        [this](const std::shared_ptr<std_msgs::msg::Float32> msg) -> void {
+          right_vel = msg->data;
+          RCLCPP_INFO(node_->get_logger(), "Right wheel velocity '%f'", msg->data);
+        });
+
+  rclcpp::init(0, nullptr);
+  rclcpp::spin(node_);
+//  std::thread spin_thread([](std::shared_ptr<rclcpp::Node> node){rclcpp::spin(node);},node_);
+
   base_x_ = 0.0;
   base_y_ = 0.0;
   base_theta_ = 0.0;
@@ -95,6 +119,8 @@ hardware_interface::return_type DiffBotSystemHardware::configure(
   }
 
   status_ = hardware_interface::status::CONFIGURED;
+
+
   return hardware_interface::return_type::OK;
 }
 
@@ -127,6 +153,7 @@ std::vector<hardware_interface::CommandInterface> DiffBotSystemHardware::export_
 hardware_interface::return_type DiffBotSystemHardware::start()
 {
   RCLCPP_INFO(rclcpp::get_logger("DiffBotSystemHardware"), "Starting ...please wait...");
+
 
   for (auto i = 0; i <= hw_start_sec_; i++)
   {
@@ -211,8 +238,6 @@ hardware_interface::return_type DiffBotSystemHardware::read()
 hardware_interface::return_type ros2_control_demo_hardware::DiffBotSystemHardware::write()
 {
   RCLCPP_INFO(rclcpp::get_logger("DiffBotSystemHardware"), "Writing...");
-
-  hardware_node.publish_vel();
 
   for (auto i = 0u; i < hw_commands_.size(); i++)
   {
