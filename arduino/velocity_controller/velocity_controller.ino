@@ -1,7 +1,6 @@
  #define COUNT_REV 3000
 
 #include "SerialCommunicator.h"
-#include <Thread.h>
 
 const int ENC_LEFT_A = 18;
 const int ENC_LEFT_B = 19;
