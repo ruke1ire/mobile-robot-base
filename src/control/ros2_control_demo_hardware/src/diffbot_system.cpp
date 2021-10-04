@@ -30,29 +30,6 @@ namespace ros2_control_demo_hardware
 hardware_interface::return_type DiffBotSystemHardware::configure(
   const hardware_interface::HardwareInfo & info)
 {
-
-  node_ = std::make_shared<rclcpp::Node>("hardware_node", rclcpp::NodeOptions());
-
-  left_publisher = node_->create_publisher<std_msgs::msg::Float32>("desired_left_vel", rclcpp::SystemDefaultsQoS());
-  right_publisher = node_->create_publisher<std_msgs::msg::Float32>("desired_right_vel", rclcpp::SystemDefaultsQoS());
-
-  left_subscriber = node_->create_subscription<std_msgs::msg::Float32>(
-        "actual_left_vel", rclcpp::SystemDefaultsQoS(),
-        [this](const std::shared_ptr<std_msgs::msg::Float32> msg) -> void {
-          left_vel = msg->data;
-          RCLCPP_INFO(node_->get_logger(), "Left wheel velocity '%f'", msg->data);
-        });
-  right_subscriber = node_->create_subscription<std_msgs::msg::Float32>(
-        "actual_right_vel", rclcpp::SystemDefaultsQoS(),
-        [this](const std::shared_ptr<std_msgs::msg::Float32> msg) -> void {
-          right_vel = msg->data;
-          RCLCPP_INFO(node_->get_logger(), "Right wheel velocity '%f'", msg->data);
-        });
-
-  rclcpp::init(0, nullptr);
-  rclcpp::spin(node_);
-//  std::thread spin_thread([](std::shared_ptr<rclcpp::Node> node){rclcpp::spin(node);},node_);
-
   base_x_ = 0.0;
   base_y_ = 0.0;
   base_theta_ = 0.0;
@@ -154,6 +131,7 @@ hardware_interface::return_type DiffBotSystemHardware::start()
 {
   RCLCPP_INFO(rclcpp::get_logger("DiffBotSystemHardware"), "Starting ...please wait...");
 
+  serial_com = SerialCommunicator();
 
   for (auto i = 0; i <= hw_start_sec_; i++)
   {
@@ -201,6 +179,7 @@ hardware_interface::return_type DiffBotSystemHardware::stop()
 hardware_interface::return_type DiffBotSystemHardware::read()
 {
   RCLCPP_INFO(rclcpp::get_logger("DiffBotSystemHardware"), "Reading...");
+  serial_com.get_vel();
 
   double radius = 0.02;  // radius of the wheels
   double dist_w = 0.1;   // distance between the wheels

@@ -18,6 +18,7 @@
 #include <memory>
 #include <string>
 #include <vector>
+#include <thread>
 
 #include "rclcpp/rclcpp.hpp"
 
@@ -29,6 +30,7 @@
 #include "hardware_interface/types/hardware_interface_status_values.hpp"
 #include "rclcpp/macros.hpp"
 #include "ros2_control_demo_hardware/visibility_control.h"
+#include "ros2_control_demo_hardware/serial_communicator.hpp"
 #include "std_msgs/msg/float32.hpp"
 
 namespace ros2_control_demo_hardware
@@ -73,18 +75,9 @@ private:
   // Store the wheeled robot position
   double base_x_, base_y_, base_theta_;
 
-  // Node
-  std::shared_ptr<rclcpp::Node> node_;
-  std::shared_ptr<rclcpp::Publisher<std_msgs::msg::Float32>> left_publisher = nullptr;
-  std::shared_ptr<rclcpp::Publisher<std_msgs::msg::Float32>> right_publisher = nullptr;
-  rclcpp::Subscription<std_msgs::msg::Float32>::SharedPtr left_subscriber = nullptr;
-  rclcpp::Subscription<std_msgs::msg::Float32>::SharedPtr right_subscriber = nullptr;
+  std::thread communicator_thread;
 
-  float left_vel = 0.0;
-  float right_vel = 0.0;
-
-  std::thread spin_thread;
-
+  SerialCommunicator serial_com;
 };
 
 }  // namespace ros2_control_demo_hardware
