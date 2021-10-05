@@ -33,7 +33,7 @@ SerialCommunicator::SerialCommunicator(){
     tty.c_iflag &= ~(ICRNL|IGNCR);
     tty.c_cflag &= ~CSTOPB;      
     tty.c_iflag |= INPCK;       
-    tty.c_cc[VTIME] = 0.1;
+    tty.c_cc[VTIME] = 1.0;
     tty.c_cc[VMIN] = 0;
 
     tcsetattr(serial_port,TCSANOW,&tty); 
@@ -44,7 +44,7 @@ SerialCommunicator::SerialCommunicator(){
     read_thread = std::thread(&SerialCommunicator::read_response, this);
 
     //wait for serial port to open
-    sleep(2);
+    sleep(3);
 }
 
 void SerialCommunicator::read_response(){
@@ -66,6 +66,7 @@ void SerialCommunicator::read_response(){
 bool SerialCommunicator::tokenize(char char_in){
     bool done = false;
 
+    //std::cout << char_in;
     if(char_in == ']' || char_in == ':' || char_in == ','){
         done = true; 
     }
