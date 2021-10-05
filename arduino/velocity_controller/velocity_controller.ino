@@ -1,4 +1,4 @@
- #define COUNT_REV 3000
+#define COUNT_REV 3000
 
 #include "SerialCommunicator.h"
 
@@ -69,8 +69,6 @@ void loop() {
     
     drive_motor('l', control_out_l);
     drive_motor('r', control_out_r);
-
-    Serial.println(control_out_l);
   }
   else if((now-prev_serial)>1){
     serial_com.communicator_loop();

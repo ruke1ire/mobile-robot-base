@@ -110,7 +110,9 @@ void SerialCommunicator::interpret()
         char response[100];
         int response_index = 0;
         response[response_index++] = '[';
-        response[response_index++] = 'l';
+        for(int i = 0; i < strlen(LEFT_VEL_RESPONSE); i++){
+          response[response_index++] = LEFT_VEL_RESPONSE[i];
+        }
         response[response_index++] = ':';
         char string_var[100];
         sprintf(string_var, "%d", (int)(actual_vel_left*180/PI*10));
@@ -118,7 +120,9 @@ void SerialCommunicator::interpret()
             response[response_index++] = string_var[i];
         }
         response[response_index++] = ',';
-        response[response_index++] = 'r';
+        for(int i = 0; i < strlen(RIGHT_VEL_RESPONSE); i++){
+          response[response_index++] = RIGHT_VEL_RESPONSE[i];
+        }
         response[response_index++] = ':';
         string_var[0] = '\0';
         sprintf(string_var, "%d", (int)(actual_vel_right*180/PI*10));
