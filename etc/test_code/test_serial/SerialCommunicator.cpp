@@ -36,8 +36,9 @@ SerialCommunicator::SerialCommunicator(){
     tty.c_cc[VTIME] = 1.0;
     tty.c_cc[VMIN] = 0;
 
+    cfsetospeed(&tty, B19200);
+    cfsetispeed(&tty, B19200);
     tcsetattr(serial_port,TCSANOW,&tty); 
-    cfsetispeed(&tty, B9600);
 
     left_vel = 0;
     right_vel = 0;
