@@ -131,7 +131,6 @@ hardware_interface::return_type DiffBotSystemHardware::start()
 {
   RCLCPP_INFO(rclcpp::get_logger("DiffBotSystemHardware"), "Starting ...please wait...");
 
-  serial_com = SerialCommunicator();
 
   for (auto i = 0; i <= hw_start_sec_; i++)
   {
@@ -179,7 +178,6 @@ hardware_interface::return_type DiffBotSystemHardware::stop()
 hardware_interface::return_type DiffBotSystemHardware::read()
 {
   RCLCPP_INFO(rclcpp::get_logger("DiffBotSystemHardware"), "Reading...");
-  serial_com.get_vel();
 
   double radius = 0.02;  // radius of the wheels
   double dist_w = 0.1;   // distance between the wheels

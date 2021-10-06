@@ -30,7 +30,6 @@
 #include "hardware_interface/types/hardware_interface_status_values.hpp"
 #include "rclcpp/macros.hpp"
 #include "ros2_control_demo_hardware/visibility_control.h"
-#include "ros2_control_demo_hardware/serial_communicator.hpp"
 #include "std_msgs/msg/float32.hpp"
 
 namespace ros2_control_demo_hardware
@@ -75,9 +74,6 @@ private:
   // Store the wheeled robot position
   double base_x_, base_y_, base_theta_;
 
-  std::thread communicator_thread;
-
-  SerialCommunicator serial_com;
 };
 
 }  // namespace ros2_control_demo_hardware

@@ -17,7 +17,7 @@ const int MOTOR_RIGHT_B = 9;
 double PI_value[2] = {-10.0, -100.0};
 const int control_period = 20; 
 
-const int baudrate = 9600;
+const int baudrate = 19200;
 
 volatile long int count_left = 0;
 volatile long int count_right = 0;
