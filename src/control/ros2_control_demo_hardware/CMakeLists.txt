@@ -21,6 +21,8 @@ add_library(
   ${PROJECT_NAME}
   SHARED
   src/diffbot_system.cpp
+  src/SerialCommunicator.cpp
+  src/Node.cpp
 )
 target_include_directories(
   ${PROJECT_NAME}

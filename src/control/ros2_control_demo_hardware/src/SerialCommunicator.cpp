@@ -7,8 +7,8 @@
 #include <string>
 #include <iostream>
 
-#include "SerialCommunicator.hpp"
-#include "Node.hpp"
+#include "ros2_control_demo_hardware/SerialCommunicator.hpp"
+#include "ros2_control_demo_hardware/Node.hpp"
 
 SerialCommunicator::SerialCommunicator(){
     serial_port = open("/dev/ttyACM0", O_RDWR);
@@ -44,32 +44,8 @@ SerialCommunicator::SerialCommunicator(){
     right_vel = 0;
     left_pos = 0;
     right_pos = 0;
-    //read_thread = std::thread(&SerialCommunicator::read_response, this);
-    //read_thread.detach();
-
-    //wait for serial port to open
     sleep(3);
 }
-
-//void SerialCommunicator::read_response(){
-//    while(true){
-//        std::cout << "hi";
-//        char *char_in;
-//        int n = read(serial_port, char_in, 1);
-//        std::cout << *char_in;
-//        bool done_tokenize = tokenize(char_in[0]);
-//        if(done_tokenize){
-//            bool done_parse = parse();
-//            if(done_parse){
-//                interpret();
-//                std::cout << node.flag << "\t" << node.variable << "\t" << std::endl;
-//                return;
-//            }
-//            token.clear();
-//        }
-//    }
-//}
-
 bool SerialCommunicator::tokenize(char char_in){
     bool done = false;
 
@@ -144,7 +120,7 @@ void SerialCommunicator::send_command(int flag, int variable){
     else{
     sprintf(command_full,"%s%s%s",START_SYM,command,END_SYM);
     }
-    printf("Sending %s\n", command_full);
+    //printf("Sending %s\n", command_full);
     write(serial_port, command_full, strlen(command_full));
 
     if(flag == GETVEL_FLAG || flag == GETPOS_FLAG){
@@ -159,7 +135,7 @@ void SerialCommunicator::send_command(int flag, int variable){
                 bool done_parse = parse();
                 if(done_parse){
                     interpret();
-                    std::cout << node.flag << "\t" << node.variable << "\t" << std::endl;
+                    //std::cout << node.flag << "\t" << node.variable << "\t" << std::endl;
                     count++;
                     if(count == 2){
                         token.clear();

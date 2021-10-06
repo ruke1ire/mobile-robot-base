@@ -26,6 +26,8 @@ double desired_vel_left = 0.0;
 double desired_vel_right = 0.0;
 double actual_vel_left = 0.0;
 double actual_vel_right = 0.0;
+double actual_pos_left = 0.0;
+double actual_pos_right = 0.0;
 
 void update_left_a();
 void update_left_b();
@@ -63,7 +65,7 @@ void loop() {
 
   if((now-prev_control)>control_period){
     prev_control = now;
-    compute_vel();
+    compute_state();
     double control_out_l = control_l(desired_vel_left, actual_vel_left, PI_value);
     double control_out_r = control_r(desired_vel_right, actual_vel_right, PI_value);
     
@@ -200,7 +202,7 @@ double convert_to_radians(int count){
   return (2*PI*(double)count)/double(COUNT_REV);
 }
 
-void compute_vel(){
+void compute_state(){
   static double previous_angle_left = convert_to_radians(count_left);
   static double previous_angle_right = convert_to_radians(count_right);
   static unsigned long int previous_time = micros();
@@ -223,6 +225,10 @@ void compute_vel(){
   else{
     actual_vel_right = actual_vel_right_tmp;
   }
+
+  actual_pos_left += actual_vel_left*((double)(current_time-previous_time+1)/1000000.0);
+  actual_pos_right += actual_vel_right*((double)(current_time-previous_time+1)/1000000.0);
+  
   previous_angle_left = current_angle_left;
   previous_angle_right = current_angle_right;
   previous_time = current_time;

@@ -7,6 +7,8 @@ extern double desired_vel_left;
 extern double desired_vel_right;
 extern double actual_vel_left;
 extern double actual_vel_right;
+extern double actual_pos_left;
+extern double actual_pos_right;
 
 SerialCommunicator::SerialCommunicator(int baudrate)
 {
@@ -126,6 +128,33 @@ void SerialCommunicator::interpret()
         response[response_index++] = ':';
         string_var[0] = '\0';
         sprintf(string_var, "%d", (int)(actual_vel_right*180/PI*10));
+        for(int i = 0; i < strlen(string_var); i++){
+            response[response_index++] = string_var[i];
+        }
+        response[response_index++] = ']';
+        response[response_index++] = '\0';
+        Serial.println(response);
+    }
+    else if(node.flag == GET_POS_FLAG){
+        char response[100];
+        int response_index = 0;
+        response[response_index++] = '[';
+        for(int i = 0; i < strlen(LEFT_POS_RESPONSE); i++){
+          response[response_index++] = LEFT_POS_RESPONSE[i];
+        }
+        response[response_index++] = ':';
+        char string_var[100];
+        sprintf(string_var, "%d", (int)(actual_pos_left*180/PI*10));
+        for(int i = 0; i < strlen(string_var); i++){
+            response[response_index++] = string_var[i];
+        }
+        response[response_index++] = ',';
+        for(int i = 0; i < strlen(RIGHT_POS_RESPONSE); i++){
+          response[response_index++] = RIGHT_POS_RESPONSE[i];
+        }
+        response[response_index++] = ':';
+        string_var[0] = '\0';
+        sprintf(string_var, "%d", (int)(actual_pos_right*180/PI*10));
         for(int i = 0; i < strlen(string_var); i++){
             response[response_index++] = string_var[i];
         }

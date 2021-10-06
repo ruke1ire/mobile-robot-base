@@ -24,8 +24,7 @@
 #include <termios.h> // Contains POSIX terminal control definitions
 #include <string>
 
-#include "Node.hpp"
-#include <thread>
+#include "ros2_control_demo_hardware/Node.hpp"
 
 class SerialCommunicator{
     public:
@@ -41,7 +40,6 @@ class SerialCommunicator{
         bool tokenize(char char_in);
         bool parse();
         void interpret();
-        //std::thread read_thread;
 };
 
 #endif

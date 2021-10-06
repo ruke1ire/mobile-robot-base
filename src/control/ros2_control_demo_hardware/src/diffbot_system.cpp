@@ -13,13 +13,13 @@
 // limitations under the License.
 
 #include "ros2_control_demo_hardware/diffbot_system.hpp"
+#include "ros2_control_demo_hardware/SerialCommunicator.hpp"
 
 #include <chrono>
 #include <cmath>
 #include <limits>
 #include <memory>
 #include <vector>
-#include <thread>
 
 #include "hardware_interface/types/hardware_interface_type_values.hpp"
 #include "rclcpp/rclcpp.hpp"
@@ -97,7 +97,6 @@ hardware_interface::return_type DiffBotSystemHardware::configure(
 
   status_ = hardware_interface::status::CONFIGURED;
 
-
   return hardware_interface::return_type::OK;
 }
 
@@ -131,6 +130,10 @@ hardware_interface::return_type DiffBotSystemHardware::start()
 {
   RCLCPP_INFO(rclcpp::get_logger("DiffBotSystemHardware"), "Starting ...please wait...");
 
+  //Serial communicator configuration
+  RCLCPP_INFO(rclcpp::get_logger("DiffBotSystemHardware"), "Configuring Serial Communicator");
+  serial_com = SerialCommunicator();
+  RCLCPP_INFO(rclcpp::get_logger("DiffBotSystemHardware"), "Configured Serial Communicator");
 
   for (auto i = 0; i <= hw_start_sec_; i++)
   {
@@ -178,29 +181,50 @@ hardware_interface::return_type DiffBotSystemHardware::stop()
 hardware_interface::return_type DiffBotSystemHardware::read()
 {
   RCLCPP_INFO(rclcpp::get_logger("DiffBotSystemHardware"), "Reading...");
+  serial_com.send_command(GETVEL_FLAG, 0);
+  serial_com.send_command(GETPOS_FLAG, 0);
 
   double radius = 0.02;  // radius of the wheels
   double dist_w = 0.1;   // distance between the wheels
   double dt = 0.01;      // Control period
-  for (uint i = 0; i < hw_commands_.size(); i++)
-  {
-    // Simulate DiffBot wheels's movement as a first-order system
-    // Update the joint status: this is a revolute joint without any limit.
-    // Simply integrates
-    hw_positions_[i] = hw_positions_[1] + dt * hw_commands_[i];
-    hw_velocities_[i] = hw_commands_[i];
 
-    RCLCPP_INFO(
-      rclcpp::get_logger("DiffBotSystemHardware"),
-      "Got position state %.5f and velocity state %.5f for '%s'!", hw_positions_[i],
-      hw_velocities_[i], info_.joints[i].name.c_str());
-  }
+//  for (uint i = 0; i < hw_commands_.size(); i++)
+//  {
+//
+//    // Simulate DiffBot wheels's movement as a first-order system
+//    // Update the joint status: this is a revolute joint without any limit.
+//    // Simply integrates
+//    hw_positions_[i] = hw_positions_[1] + dt * hw_commands_[i];
+//    hw_velocities_[i] = hw_commands_[i];
+//
+//    RCLCPP_INFO(
+//      rclcpp::get_logger("DiffBotSystemHardware"),
+//      "Got position state %.5f and velocity state %.5f for '%s'!", hw_positions_[i],
+//      hw_velocities_[i], info_.joints[i].name.c_str());
+//  }
+
+  //NOTE: only hw_command_[0] and [1] is used therefore I can directly set the values for 0 and 1, 0 is the right wheel, 1 is the left wheel
+  hw_positions_[0] = (double)serial_com.right_pos*(0.1*M_PI/180.0);
+  hw_positions_[1] = (double)serial_com.left_pos*(0.1*M_PI/180.0);
+  hw_velocities_[0] = (double)serial_com.right_vel*(0.1*M_PI/180.0);
+  hw_velocities_[1] = (double)serial_com.left_vel*(0.1*M_PI/180.0);
+
+  RCLCPP_INFO(
+    rclcpp::get_logger("DiffBotSystemHardware"),
+    "Got position state %.5f and velocity state %.5f for '%s'!", hw_positions_[0],
+    hw_velocities_[0], info_.joints[0].name.c_str());
+
+  RCLCPP_INFO(
+    rclcpp::get_logger("DiffBotSystemHardware"),
+    "Got position state %.5f and velocity state %.5f for '%s'!", hw_positions_[1],
+    hw_velocities_[1], info_.joints[1].name.c_str());
+
 
   // Update the free-flyer, i.e. the base notation using the classical
   // wheel differentiable kinematics
-  double base_dx = 0.5 * radius * (hw_commands_[0] + hw_commands_[1]) * cos(base_theta_);
-  double base_dy = 0.5 * radius * (hw_commands_[0] + hw_commands_[1]) * sin(base_theta_);
-  double base_dtheta = radius * (hw_commands_[0] - hw_commands_[1]) / dist_w;
+  double base_dx = 0.5 * radius * (hw_velocities_[0] + hw_velocities_[1]) * cos(base_theta_);
+  double base_dy = 0.5 * radius * (hw_velocities_[0] + hw_velocities_[1]) * sin(base_theta_);
+  double base_dtheta = radius * (hw_velocities_[0] - hw_velocities_[1]) / dist_w;
   base_x_ += base_dx * dt;
   base_y_ += base_dy * dt;
   base_theta_ += base_dtheta * dt;
@@ -216,13 +240,23 @@ hardware_interface::return_type ros2_control_demo_hardware::DiffBotSystemHardwar
 {
   RCLCPP_INFO(rclcpp::get_logger("DiffBotSystemHardware"), "Writing...");
 
-  for (auto i = 0u; i < hw_commands_.size(); i++)
-  {
-    // Simulate sending commands to the hardware
-    RCLCPP_INFO(
-      rclcpp::get_logger("DiffBotSystemHardware"), "Got command %.5f for '%s'!", hw_commands_[i],
-      info_.joints[i].name.c_str());
-  }
+//  for (auto i = 0u; i < hw_commands_.size(); i++)
+//  {
+//    // Simulate sending commands to the hardware
+//    RCLCPP_INFO(
+//      rclcpp::get_logger("DiffBotSystemHardware"), "Got command %.5f for '%s'!", hw_commands_[i],
+//      info_.joints[i].name.c_str());
+//  }
+
+  serial_com.send_command(SETVELR_FLAG, hw_commands_[0]*180.0/M_PI*10);
+  serial_com.send_command(SETVELL_FLAG, hw_commands_[1]*180.0/M_PI*10);
+  RCLCPP_INFO(
+    rclcpp::get_logger("DiffBotSystemHardware"), "Got command %.5f for '%s'!", hw_commands_[0],
+    info_.joints[0].name.c_str());
+  RCLCPP_INFO(
+    rclcpp::get_logger("DiffBotSystemHardware"), "Got command %.5f for '%s'!", hw_commands_[1],
+    info_.joints[1].name.c_str());
+
   RCLCPP_INFO(rclcpp::get_logger("DiffBotSystemHardware"), "Joints successfully written!");
 
   return hardware_interface::return_type::OK;
