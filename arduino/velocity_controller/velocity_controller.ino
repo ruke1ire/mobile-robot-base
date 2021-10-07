@@ -15,7 +15,6 @@ const int MOTOR_RIGHT_A = 8;
 const int MOTOR_RIGHT_B = 9;
 
 double PI_value[2] = {-10.0, -100.0};
-double P_value_compensation = 1.0;
 const int control_period = 20; 
 
 const int baudrate = 19200;
@@ -174,7 +173,7 @@ void velocity_compensation(){
   double desired_diff = desired_vel_right - desired_vel_left;
   double actual_diff = actual_vel_right - actual_vel_left;
 
-  double compensation = (P_value_compensation*(desired_diff-actual_diff));
+  double compensation = desired_diff-actual_diff;
   desired_vel_right += compensation;
   desired_vel_left -= compensation;
 }
