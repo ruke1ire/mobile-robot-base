@@ -15,8 +15,8 @@ const int MOTOR_RIGHT_A = 8;
 const int MOTOR_RIGHT_B = 9;
 
 double PI_value[2] = {-10.0, -100.0};
-double compensation_gain = 0.1;
-const int control_period = 50; 
+double compensation_gain = 0.5;
+const int control_period = 10; 
 
 const int baudrate = 19200;
 
