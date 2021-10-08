@@ -1,0 +1,11 @@
+[Unit]
+Description=Service for running mobile robot controller and camera module
+
+[Service]
+User=root
+Type=simple
+WorkingDirectory=/home/ubuntu/mobile-robot-base
+ExecStart=/home/ubuntu/mobile-robot-base/src/init/startup.sh
+
+[Install]
+WantedBy=multi-user.target
