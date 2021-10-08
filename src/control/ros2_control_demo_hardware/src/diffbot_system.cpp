@@ -204,10 +204,10 @@ hardware_interface::return_type DiffBotSystemHardware::read()
 //  }
 
   //NOTE: only hw_command_[0] and [1] is used therefore I can directly set the values for 0 and 1, 0 is the right wheel, 1 is the left wheel
-  hw_positions_[0] = (double)serial_com.right_pos*(0.1*M_PI/180.0);
-  hw_positions_[1] = (double)serial_com.left_pos*(0.1*M_PI/180.0);
-  hw_velocities_[0] = (double)serial_com.right_vel*(0.1*M_PI/180.0);
-  hw_velocities_[1] = (double)serial_com.left_vel*(0.1*M_PI/180.0);
+  hw_positions_[0] = (double)serial_com.left_pos*(0.1*M_PI/180.0);
+  hw_positions_[1] = (double)serial_com.right_pos*(0.1*M_PI/180.0);
+  hw_velocities_[0] = (double)serial_com.left_vel*(0.1*M_PI/180.0);
+  hw_velocities_[1] = (double)serial_com.right_vel*(0.1*M_PI/180.0);
 
   RCLCPP_INFO(
     rclcpp::get_logger("DiffBotSystemHardware"),
@@ -248,8 +248,8 @@ hardware_interface::return_type ros2_control_demo_hardware::DiffBotSystemHardwar
 //      info_.joints[i].name.c_str());
 //  }
 
-  serial_com.send_command(SETVELR_FLAG, hw_commands_[0]*180.0/M_PI*10);
-  serial_com.send_command(SETVELL_FLAG, hw_commands_[1]*180.0/M_PI*10);
+  serial_com.send_command(SETVELR_FLAG, hw_commands_[1]*180.0/M_PI*10);
+  serial_com.send_command(SETVELL_FLAG, hw_commands_[0]*180.0/M_PI*10);
   RCLCPP_INFO(
     rclcpp::get_logger("DiffBotSystemHardware"), "Got command %.5f for '%s'!", hw_commands_[0],
     info_.joints[0].name.c_str());
