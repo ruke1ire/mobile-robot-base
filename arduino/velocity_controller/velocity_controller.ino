@@ -15,7 +15,8 @@ const int MOTOR_RIGHT_A = 8;
 const int MOTOR_RIGHT_B = 9;
 
 double PI_value[2] = {-10.0, -100.0};
-const int control_period = 20; 
+double compensation_gain = 0.1;
+const int control_period = 50; 
 
 const int baudrate = 19200;
 
@@ -35,7 +36,7 @@ void update_left_b();
 void update_right_a();
 void update_right_b();
 
-void velocity_compensation();
+double velocity_compensation();
 double control_l(double desired, double actual, double pi[2]);
 double control_r(double desired, double actual, double pi[2]);
 double convert_to_radians(int count);
@@ -68,9 +69,9 @@ void loop() {
   if((now-prev_control)>control_period){
     prev_control = now;
     compute_state();
-    velocity_compensation();
-    double control_out_l = control_l(desired_vel_left, actual_vel_left, PI_value);
-    double control_out_r = control_r(desired_vel_right, actual_vel_right, PI_value);
+    double compensation = velocity_compensation();
+    double control_out_l = control_l(desired_vel_left-compensation*compensation_gain, actual_vel_left, PI_value);
+    double control_out_r = control_r(desired_vel_right+compensation*compensation_gain, actual_vel_right, PI_value);
     
     drive_motor('l', control_out_l);
     drive_motor('r', control_out_r);
@@ -169,13 +170,11 @@ void update_right_b() {
   }
 }
 
-void velocity_compensation(){
+double velocity_compensation(){
   double desired_diff = desired_vel_right - desired_vel_left;
   double actual_diff = actual_vel_right - actual_vel_left;
 
-  double compensation = desired_diff-actual_diff;
-  desired_vel_right += compensation;
-  desired_vel_left -= compensation;
+  return (desired_diff-actual_diff);
 }
 
 double control_l(double desired, double actual, double pi[2]){
