@@ -31,10 +31,10 @@ Run Controller:
 Startup:
 
 Systemd is used to startup the program automatically on every reboot. Following are a few useful commands for monitoring/controlling the program.
-> sudo systemctl status mobile_robot_base
-> sudo systemctl start mobile_robot_base
-> sudo systemctl stop mobile_robot_base
-> journalctl -fu mobile_robot_base
+> sudo systemctl status mobile_robot_base 
+> sudo systemctl start mobile_robot_base 
+> sudo systemctl stop mobile_robot_base 
+> journalctl -fu mobile_robot_base  
 
 
 Reference:
