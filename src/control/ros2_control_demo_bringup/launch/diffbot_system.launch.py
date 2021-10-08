@@ -1,4 +1,4 @@
-# Copyright 2020 ros2_control Development Team
+
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -26,6 +26,12 @@ def generate_launch_description():
         "start_rviz",
         default_value="false",
         description="start RViz automatically with the launch file",
+    )
+
+    arg_show_camera = DeclareLaunchArgument(
+        "start_camera",
+        default_value="false",
+        description="start the v4l2_camera node",
     )
 
     # Get URDF via xacro
@@ -89,13 +95,25 @@ def generate_launch_description():
         condition=IfCondition(LaunchConfiguration("start_rviz")),
     )
 
+    camera_node = Node(
+        package="v4l2_camera",
+        executable="v4l2_camera_node",
+        output={
+            "stdout": "screen",
+            "stderr": "screen",
+        },
+        condition=IfCondition(LaunchConfiguration("start_camera")),
+    )
+
     return LaunchDescription(
         [
             arg_show_rviz,
+            arg_show_camera,
             node_robot_state_publisher,
             controller_manager_node,
             spawn_dd_controller,
             spawn_jsb_controller,
             rviz_node,
+            camera_node,
         ]
     )
