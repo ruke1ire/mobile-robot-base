@@ -28,7 +28,13 @@ Run Controller:
 
 > ros2 launch ros2_control_demo_bringup diffbot_system.launch.py 
 
-> ros2 topic pub /diffbot_base_controller/cmd_vel_unstamped geometry_msgs/msg/Twist "{linear: {x: -0.2, y: 0.0, z: 0.0}, angular: {x: 0.0, y: 0.0, z: 0.0}}"
+> ros2 topic pub /diffbot_base_controller/cmd_vel_unstamped geometry_msgs/msg/Twist "{linear: {x: 0.1, y: 0.0, z: 0.0}, angular: {x: 0.0, y: 0.0, z: 0.0}}"
+
+Run teleop_twist_keyboard:
+> ros2 run teleop_twist_keyboard teleop_twist_keyboard --ros-args --remap cmd_vel:=/diffbot_base_controller/cmd_vel_unstamped
+
+Run Rviz2:
+> ros2 run rviz2 rviz2 -d ./src/control/ros2_control_demo_description/diffbot_description/config/diffbot.rviz
 
 Startup:
 
